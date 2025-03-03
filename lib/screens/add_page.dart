@@ -8,7 +8,8 @@ class AddPage extends StatefulWidget {
 }
 
 class _AddPageState extends State<AddPage> {
-  final _formKey = GlobalKey<FormState>(); // ใช้สำหรับการตรวจสอบความถูกต้องของฟอร์ม
+  final _formKey =
+      GlobalKey<FormState>(); // ใช้สำหรับการตรวจสอบความถูกต้องของฟอร์ม
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
@@ -16,15 +17,14 @@ class _AddPageState extends State<AddPage> {
   DateTime? _selectedDate;
 
   final List<String> _categories = [
-  'เครื่องมือวิจัย',
-  'หุ่นยนต์',
-  'เทคโนโลยีชีวภาพ',
-  'วัสดุนาโน',
-  'พลังงานทดแทน',
-  'อวกาศ',
-  'เทคโนโลยีสารสนเทศ',
-];
-
+    'เครื่องมือวิจัย',
+    'หุ่นยนต์',
+    'เทคโนโลยีชีวภาพ',
+    'วัสดุนาโน',
+    'พลังงานทดแทน',
+    'อวกาศ',
+    'เทคโนโลยีสารสนเทศ',
+  ];
 
   // ฟังก์ชันเมื่อกดปุ่มส่งข้อมูล
   void _submitForm() {
@@ -51,7 +51,10 @@ class _AddPageState extends State<AddPage> {
     if (pickedDate != null && pickedDate != _selectedDate) {
       setState(() {
         _selectedDate = pickedDate;
-        _dateController.text = _selectedDate!.toLocal().toString().split(' ')[0]; // แสดงวันที่ในฟอร์ม
+        _dateController.text = _selectedDate!
+            .toLocal()
+            .toString()
+            .split(' ')[0]; // แสดงวันที่ในฟอร์ม
       });
     }
   }
@@ -74,7 +77,8 @@ class _AddPageState extends State<AddPage> {
                 // ชื่อ/หัวข้อ
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(labelText: 'ชื่อสิ่งประดิษฐ์'),
+                  decoration:
+                      const InputDecoration(labelText: 'ชื่อสิ่งประดิษฐ์'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'กรุณากรอกชื่อสิ่งประดิษฐ์';
@@ -113,7 +117,8 @@ class _AddPageState extends State<AddPage> {
                 // Dropdown (หมวดหมู่/ประเภท)
                 DropdownButtonFormField<String>(
                   value: _selectedCategory,
-                  decoration: const InputDecoration(labelText: 'หมวดหมู่'),
+                  decoration: const InputDecoration(
+                      labelText: 'หมวดหมู่สิ่งประดิษฐ์ทางวิทยาศาสตร์'),
                   items: _categories.map((category) {
                     return DropdownMenuItem(
                       value: category,
@@ -127,17 +132,19 @@ class _AddPageState extends State<AddPage> {
                   },
                   validator: (value) {
                     if (value == null) {
-                      return 'กรุณาเลือกหมวดหมู่';
+                      return 'กรุณาเลือกหมวดหมู่สิ่งประดิษฐ์ทางวิทยาศาสตร์';
                     }
                     return null;
                   },
                 ),
+
                 const SizedBox(height: 20),
                 // ปุ่มส่งข้อมูล
                 ElevatedButton(
                   onPressed: _submitForm,
                   child: const Text('เพิ่มสิ่งประดิษฐ์'),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent),
                 ),
               ],
             ),

@@ -7,11 +7,11 @@
     WidgetsFlutterBinding.ensureInitialized();
     await Hive.initFlutter();
     await Hive.openBox('inventionsBox'); // เปิดฐานข้อมูล Hive
-    runApp(const MyApp());
+    runApp(const scientific_inventions());
   }
 
-  class MyApp extends StatelessWidget {
-    const MyApp({super.key});
+  class scientific_inventions extends StatelessWidget {
+    const scientific_inventions({super.key});
 
     @override
     Widget build(BuildContext context) {
