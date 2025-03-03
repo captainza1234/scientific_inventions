@@ -8,73 +8,139 @@ class AddPage extends StatefulWidget {
 }
 
 class _AddPageState extends State<AddPage> {
-  final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>(); // ใช้สำหรับการตรวจสอบความถูกต้องของฟอร์ม
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
-  String _selectedCategory = 'ทั่วไป';
-  final List<String> _categories = ['ทั่วไป', 'เครื่องกล', 'อิเล็กทรอนิกส์', 'ชีวภาพ'];
+  String? _selectedCategory;
+  DateTime? _selectedDate;
 
-  void _saveInvention() {
+  final List<String> _categories = [
+  'เครื่องมือวิจัย',
+  'หุ่นยนต์',
+  'เทคโนโลยีชีวภาพ',
+  'วัสดุนาโน',
+  'พลังงานทดแทน',
+  'อวกาศ',
+  'เทคโนโลยีสารสนเทศ',
+];
+
+
+  // ฟังก์ชันเมื่อกดปุ่มส่งข้อมูล
+  void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      // สร้างข้อมูลเป็น Map
+      // หากข้อมูลถูกต้อง
       final newInvention = {
         'name': _nameController.text,
-        'category': _selectedCategory,
-        'date': _dateController.text,
+        'category': _selectedCategory!,
+        'quantity': _quantityController.text,
+        'date': _selectedDate!.toLocal().toString(),
       };
-      // ส่งข้อมูลกลับไปที่ HomePage
-      Navigator.pop(context, newInvention);
+      Navigator.pop(context, newInvention); // ส่งข้อมูลกลับไปที่ HomePage
+    }
+  }
+
+  // ฟังก์ชันเลือกวันที่
+  Future<void> _pickDate() async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (pickedDate != null && pickedDate != _selectedDate) {
+      setState(() {
+        _selectedDate = pickedDate;
+        _dateController.text = _selectedDate!.toLocal().toString().split(' ')[0]; // แสดงวันที่ในฟอร์ม
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('เพิ่มสิ่งประดิษฐ์')),
+      appBar: AppBar(
+        title: const Text('เพิ่มสิ่งประดิษฐ์'),
+        backgroundColor: Colors.blueAccent,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: 'ชื่อสิ่งประดิษฐ์'),
-                validator: (value) => value!.isEmpty ? 'กรุณากรอกชื่อ' : null,
-              ),
-              DropdownButtonFormField(
-                value: _selectedCategory,
-                items: _categories.map((category) {
-                  return DropdownMenuItem(value: category, child: Text(category));
-                }).toList(),
-                onChanged: (value) {
-                  setState(() => _selectedCategory = value!);
-                },
-                decoration: const InputDecoration(labelText: 'หมวดหมู่'),
-              ),
-              TextFormField(
-                controller: _dateController,
-                decoration: const InputDecoration(labelText: 'วันที่'),
-                onTap: () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2101),
-                  );
-                  if (pickedDate != null) {
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ชื่อ/หัวข้อ
+                TextFormField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(labelText: 'ชื่อสิ่งประดิษฐ์'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'กรุณากรอกชื่อสิ่งประดิษฐ์';
+                    }
+                    return null;
+                  },
+                ),
+                // ช่องป้อนตัวเลข (จำนวน)
+                TextFormField(
+                  controller: _quantityController,
+                  decoration: const InputDecoration(labelText: 'จำนวน'),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'กรุณากรอกจำนวน';
+                    }
+                    if (int.tryParse(value) == null) {
+                      return 'กรุณากรอกตัวเลขที่ถูกต้อง';
+                    }
+                    return null;
+                  },
+                ),
+                // ตัวเลือกวันที่
+                TextFormField(
+                  controller: _dateController,
+                  decoration: const InputDecoration(labelText: 'วันที่'),
+                  readOnly: true,
+                  onTap: _pickDate,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'กรุณาเลือกวันที่';
+                    }
+                    return null;
+                  },
+                ),
+                // Dropdown (หมวดหมู่/ประเภท)
+                DropdownButtonFormField<String>(
+                  value: _selectedCategory,
+                  decoration: const InputDecoration(labelText: 'หมวดหมู่'),
+                  items: _categories.map((category) {
+                    return DropdownMenuItem(
+                      value: category,
+                      child: Text(category),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
                     setState(() {
-                      _dateController.text = "${pickedDate.toLocal()}".split(' ')[0];
+                      _selectedCategory = value;
                     });
-                  }
-                },
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _saveInvention,
-                child: const Text('บันทึก'),
-              ),
-            ],
+                  },
+                  validator: (value) {
+                    if (value == null) {
+                      return 'กรุณาเลือกหมวดหมู่';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                // ปุ่มส่งข้อมูล
+                ElevatedButton(
+                  onPressed: _submitForm,
+                  child: const Text('เพิ่มสิ่งประดิษฐ์'),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
+                ),
+              ],
+            ),
           ),
         ),
       ),
